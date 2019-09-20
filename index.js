@@ -58,7 +58,7 @@ const acb2 = function() {
               fileName,
               contentLength,
               mime: contentType,
-              data: response.body
+              data: response.data
             })
             .then(done)
             .catch(done)
