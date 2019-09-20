@@ -1,0 +1,39 @@
+{
+  "name": "ac-backblaze-uploader",
+  "author": "Mark Poepping (https://www.mmpro.de)",
+  "license": "MIT",
+  "repository": "mmpro/ac-backblaze-uploader",
+  "version": "0.0.1",
+  "dependencies": {
+    "async": "^3.1.0",
+    "axios": "^0.19.0",
+    "backblaze-b2": "^1.4.0",
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "ac-conventional-changelog-template": "git+https://github.com/mmpro/ac-conventional-changelog-template.git",
+    "corp-semantic-release": "git+https://github.com/mmpro/corp-semantic-release.git",
+    "cz-customizable": "git+https://github.com/mmpro/cz-customizable.git",
+    "eslint": "^6.4.0",
+    "expect": "^24.x",
+    "mocha": "^6.x",
+    "mocha-jenkins-reporter": "github:mmpro/mocha-jenkins-reporter",
+    "mocha-junit-reporter": "^1.18.0",
+    "mocha-multi-reporters": "^1.1.4"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    },
+    "cz-customizable": {
+      "config": ".czConfig.js"
+    }
+  },
+  "scripts": {
+    "test": "mocha --reporter spec",
+    "test-jenkins": "JUNIT_REPORT_PATH=./report.xml mocha --colors --reporter mocha-jenkins-reporter --reporter-options junit_report_name='BackblazeUploader'"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  }
+}
