@@ -150,6 +150,7 @@ const acb2 = function() {
               })
               .catch(callback)
             })
+            .catch(callback)
           },
           done)
       },
@@ -165,7 +166,16 @@ const acb2 = function() {
         })
         .catch(done)
       }
-    }, cb)
+    }, (err) => {
+      if (err && !classicUpload) {
+        b2.cancelLargeFile({
+          fileId
+        }).catch(err => {
+          console.log('ACB2 | Cancel Large File Upload failed %j', err)
+        })
+      }
+      return cb(err)
+    })
   }
 
   return {
