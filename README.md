@@ -9,7 +9,12 @@ const acb2 = require('./index')
 let backblaze = {
   applicationKeyId: 'xxx',
   applicationKey: 'yyyy',
-  bucketId: 'zzz'
+  bucketId: 'zzz',
+  encryption: {
+    enabled: true,
+    password: 'very-good-password',
+    algorithm: 'aes256' // default
+  }
 }
 
 acb2.init(backblaze)

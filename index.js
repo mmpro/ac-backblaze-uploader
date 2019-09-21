@@ -3,6 +3,7 @@ const async = require('async')
 
 const B2 = require('backblaze-b2');
 const axios = require('axios')
+const crypto = require('crypto');
 
 const acb2 = function() {
   
@@ -12,14 +13,19 @@ const acb2 = function() {
     b2Auth.applicationKeyId = _.get(params, 'applicationKeyId')
     b2Auth.applicationKey = _.get(params, 'applicationKey')
     b2Auth.bucketId = _.get(params, 'bucketId')
+    b2Auth.encryption = _.get(params, 'encryption')
   }
 
   const upload = async function(params, cb) {
     const url = _.get(params, 'url')
     const fileName = _.get(params, 'fileName')
+    const expectedFileSize = _.get(params, 'expectedFileSize')
     const bucketId = _.get(b2Auth, 'bucketId') 
 
-    const b2 = new B2(b2Auth)
+    const b2 = new B2({
+      applicationKeyId: b2Auth.applicationKeyId,
+      applicationKey: b2Auth.applicationKey
+    })
     await b2.authorize()
 
     const multipartUploadThreshold = (5 * 1024 * 1024)
@@ -50,17 +56,35 @@ const acb2 = function() {
         .then(response => {
           let uploadUrl = response.data.uploadUrl;
           let authToken = response.data.authorizationToken;
+          
+          axios({
+            method: 'get',
+            url,
+            responseType: 'arraybuffer' 
+          })
+          .then(response => {
+            let uploadData = response.data
+            if (_.get(b2Auth, 'encryption.enabled') && _.get(b2Auth, 'encryption.password')) {
+              const algorithm =  _.get(b2Auth, 'encryption.algorithm', 'aes256')
+              const password = _.get(b2Auth, 'encryption.password')
+              const cipher = crypto.createCipher(algorithm, password)
+              uploadData = Buffer.concat([new Buffer(cipher.update(uploadData), 'binary'), new Buffer(cipher.final('binary'), 'binary')])
+            }
 
-          axios.get(url).then(response => {
             b2.uploadFile({
               uploadUrl,
               uploadAuthToken: authToken,
               fileName,
               contentLength,
               mime: contentType,
-              data: response.data
+              data: uploadData
             })
-            .then(done)
+            .then(response => {
+              if (!_.get(b2Auth, 'encryption.enabled') && _.get(response, 'data.contentLength') !== expectedFileSize) {
+                return done({ message: 'fileSizeMismatch', status: 400, additionaInfo: { fileSize: _.get(response, 'data.contentLength'), expectedFileSize } })
+              }
+              return done(null, response.data)       
+            })
             .catch(done)
           })
           .catch(done)
@@ -96,6 +120,14 @@ const acb2 = function() {
             })            
           .then( (res) => {
             rangeStart += res.data.length
+ 
+            let uploadData = res.data
+            if (_.get(b2Auth, 'encryption.enabled') && _.get(b2Auth, 'encryption.password')) {
+              const algorithm =  _.get(b2Auth, 'encryption.algorithm', 'aes256')
+              const password = _.get(b2Auth, 'encryption.password')
+              const cipher = crypto.createCipher(algorithm, password)
+              uploadData = Buffer.concat([new Buffer(cipher.update(uploadData), 'binary'), new Buffer(cipher.final('binary'), 'binary')])
+            }
 
             // upload that part
             b2.getUploadPartUrl({ fileId })
@@ -107,7 +139,7 @@ const acb2 = function() {
                   partNumber,
                   uploadUrl,
                   uploadAuthToken: authToken,
-                  data: res.data
+                  data: uploadData
                 })
                 .then(part => {
                   parts.push(part.data)
