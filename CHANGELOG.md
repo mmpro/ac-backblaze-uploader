@@ -1,3 +1,14 @@
+<a name="1.1.1"></a>
+## [1.1.1](https://github.com/mmpro/ac-backblaze-uploader/compare/v1.1.0...v1.1.1) (2019-09-21 16:27)
+
+
+### Bug Fixes
+
+* **Uploader:** Minor fixes | MP ([5c47577](https://github.com/mmpro/ac-backblaze-uploader/commit/5c47577))    
+  Minor fixes. End large file upload if something goes wrong.
+
+
+
 <a name="1.1.0"></a>
 # [1.1.0](https://github.com/mmpro/ac-backblaze-uploader/compare/v1.0.1...v1.1.0) (2019-09-21 06:30)
 
