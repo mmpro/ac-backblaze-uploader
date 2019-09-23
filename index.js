@@ -18,6 +18,7 @@ const acb2 = function() {
 
   const upload = async function(params, cb) {
     const url = _.get(params, 'url')
+    const headUrl = _.get(params, 'headUrl', url)
     const fileName = _.get(params, 'fileName')
     const expectedFileSize = _.get(params, 'expectedFileSize')
     const bucketId = _.get(b2Auth, 'bucketId') 
@@ -39,7 +40,7 @@ const acb2 = function() {
 
     async.series({
       headObject: (done) => {
-        axios.head(url)
+        axios.head(headUrl)
         .then(response => {
           contentLength = _.get(response, 'headers.content-length')
           contentType = _.get(response, 'headers.content-type')
