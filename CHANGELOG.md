@@ -1,3 +1,15 @@
+<a name="1.1.2"></a>
+## [1.1.2](https://github.com/mmpro/ac-backblaze-uploader/compare/v1.1.1...v1.1.2) (2019-09-23 14:46)
+
+
+### Bug Fixes
+
+* **Uploader:** Allow optional (different) headUrl | MP ([6802f96](https://github.com/mmpro/ac-backblaze-uploader/commit/6802f96))    
+  If you use signed urls (e.g. AWS S3) then the signed URL contains the HTTP verb, therefore you must
+use different URLs for HEAD and GET
+
+
+
 <a name="1.1.1"></a>
 ## [1.1.1](https://github.com/mmpro/ac-backblaze-uploader/compare/v1.1.0...v1.1.1) (2019-09-21 16:27)
 
